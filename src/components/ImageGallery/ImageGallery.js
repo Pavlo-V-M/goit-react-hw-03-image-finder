@@ -1,77 +1,94 @@
-// import React, { Component } from 'react';
-// import {getSearchElements} from '../../api/api'
-
-// class ImageGallery extends Component {
-//   state = {
-//     images: []
-//   };
-
-//   componentDidMount() {
-//     const data = getSearchElements()
-//     data.then(res => console.log(res))
-//   }
-
-//   componentDidUpdate(prevProps) {
-//     if (prevProps.searchText !== this.props.searchText) {
-//       getSearchElements(this.props.searchText).then((data) =>
-//         this.setState({images: data})
-//       )
-//     }
-//   }
-
-//   render() {
-//     return (
-//       this.state.images.length > 0 && (
-//         <ul className="gallery">
-//           {this.state.images.map((el) => (
-//             <li key={el.id}>
-//               {el.id}
-//             </li>
-//           ))}
-//         </ul>
-//       )
-//     )
-//   }
-// }
-
-// export default ImageGallery;
-
-// ------------------------------------------------------
-
 import React, { Component } from 'react';
-import { getSearchElements } from '../../api/api';
+import { getSearchElements } from '../../api/api'
 import ImageGalleryItem from '../ImageGalleryItem/ImageGalleryItem';
+import Button from '../Button/Button';
 
 class ImageGallery extends Component {
   state = {
-    images: []
+  images: [],
+  currentPage: 1,
+  loadedImagesCount: 0,
+  totalHits: 0,
   };
 
-  componentDidUpdate(prevProps) {
-    if (prevProps.searchText !== this.props.searchText && this.props.searchText) {
-      this.fetchImages();
-    }
+  componentDidMount() {
+    // const data = getSearchElements()
+    // data.then(res => console.log(res))
   }
 
+  // Modification function componentDidUpdate
+
+  // componentDidUpdate(prevProps) { console.log (this.props.searchText)
+  //   if (prevProps.searchText !== this.props.searchText) {
+  //     this.fetchImages();
+  //   }
+  // }
+
+  componentDidUpdate(prevProps) {
+    if (prevProps.searchText !== this.props.searchText) {
+      this.setState({
+        images: [], // Reset images
+        currentPage: 1,
+        loadedImagesCount: 0, // Reset loadedImagesCount
+      }, () => {
+        this.fetchImages(); // Fetch new images after resetting the state
+      });
+    }
+  };
+
   fetchImages = () => {
-    getSearchElements(this.props.searchText).then((data) =>
-      this.setState({ images: data.hits })
-    );
+    const { searchText } = this.props;
+    const { currentPage } = this.state;
+    const perPage = 12; // Number of images per page
+
+    getSearchElements(searchText, perPage, currentPage).then((data) => {
+      console.log(data);
+      const newImages = data.hits;
+      this.setState((prevState) => ({
+        images: [...prevState.images, ...newImages],
+        currentPage: prevState.currentPage + 1,
+        loadedImagesCount: prevState.loadedImagesCount + newImages.length, // Increment loadedImagesCount
+        totalHits: data.totalHits
+      }));
+
+      setTimeout(() => {
+      console.log("Loaded Images Count:", this.state.loadedImagesCount);
+    }, 0);
+    });
+  };
+
+  handleImageClick = (image) => {
+    this.props.toggleModal(image);
   };
 
   render() {
-    const { images } = this.state;
+    const { images, loadedImagesCount, totalHits } = this.state;
+    const showLoadMore = images.length > 0 && loadedImagesCount < totalHits;
 
     return (
-      images.length > 0 && (
-        <ul className="ImageGallery">
-          {images.map((image) => (
-            <ImageGalleryItem key={image.id} image={image} />
-          ))}
-        </ul>
-      )
+      <div className="ImageGalleryWrap">
+        {images.length > 0 && (
+          <ul className="ImageGallery">
+            <ImageGalleryItem images={images} onImageClick={this.handleImageClick} />
+          </ul>
+        )}
+        {showLoadMore && <Button onLoadMore={this.fetchImages} />}
+      </div>
     );
   }
 }
 
 export default ImageGallery;
+
+// ------------------------------------------------------
+
+// componentDidUpdate(prevProps) { console.log (this.props.searchText)
+  //   if (prevProps.searchText !== this.props.searchText) {
+  //     getSearchElements(this.props.searchText).then((data) => {
+  //       console.log(data);
+  //       this.setState({ images: [...data.hits] });
+  //       console.log(this.state.images);
+  //       }
+  //     )
+  //   }
+  // }

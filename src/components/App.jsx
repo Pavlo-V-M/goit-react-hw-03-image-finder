@@ -1,41 +1,42 @@
-// export const App = () => {
-//   return (
-//     <div
-//       style={{
-//         height: '100vh',
-//         display: 'flex',
-//         justifyContent: 'center',
-//         alignItems: 'center',
-//         fontSize: 40,
-//         color: '#010101'
-//       }}
-//     >
-//       React homework template
-//     </div>
-//   );
-// };
-
 import React from 'react';
 import Searchbar from './Searchbar/Searchbar';
 import ImageGallery from './ImageGallery/ImageGallery';
-import Button from './Button/Button';
+import Modal from './Modal/Modal';
 
 export class App extends React.Component {
   state = {
     isShowModal: false,
-    searchText: ''
-  }
-  
+    searchText: '',
+    selectedImage: '',
+  };
+
   handleSearch = (searchText) => {
-    this.setState({searchText})
-  }
+    this.setState({ searchText })
+  };
+
+  toggleModal = (image) => {
+    this.setState((prevState) => ({
+      isShowModal: !prevState.isShowModal,
+      selectedImage: image,
+    }));
+  };
+
+  closeModal = () => {
+    this.setState({
+      isShowModal: false,
+      // selectedImage: '',
+    });
+  };
 
   render() {
+    const { isShowModal, selectedImage } = this.state;
     return (
-      <div>
+      <div className="appRenderWrap">
         <Searchbar handleSearch={this.handleSearch} />
-        <ImageGallery searchText={this.state.searchText} />
-        <Button />        
+        <ImageGallery searchText={this.state.searchText} toggleModal={this.toggleModal} />
+        {isShowModal && (
+          <Modal image={selectedImage} closeModal={this.closeModal} />
+        )}
       </div>
     );
   }

@@ -1,11 +1,14 @@
 
 import React from 'react';
 
-const Button = () => {
+const Button = (props) => {
+  const { onLoadMore } = props;
   
   return (
     <div className="LoadMoreWrap">
-      <button type="buttton" className="Button">Load more</button>
+      <button type="buttton" className="Button" onClick={onLoadMore}>
+        Load more
+      </button>
     </div>    
   );
 };
