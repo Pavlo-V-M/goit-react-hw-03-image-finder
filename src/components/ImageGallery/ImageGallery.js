@@ -1,4 +1,5 @@
 import React, { Component } from 'react';
+import PropTypes from 'prop-types';
 import { getSearchElements } from '../../api/api'
 import ImageGalleryItem from '../ImageGalleryItem/ImageGalleryItem';
 import Button from '../Button/Button';
@@ -77,6 +78,11 @@ class ImageGallery extends Component {
     );
   }
 }
+
+ImageGallery.propTypes = {
+  toggleModal: PropTypes.func.isRequired,
+  searchText: PropTypes.string.isRequired,
+};
 
 export default ImageGallery;
 

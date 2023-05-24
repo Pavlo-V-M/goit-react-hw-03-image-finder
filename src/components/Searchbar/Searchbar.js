@@ -1,5 +1,6 @@
 
 import React, { Component } from 'react';
+import PropTypes from 'prop-types';
 import { RotatingSquare } from 'react-loader-spinner';
 
 class Searchbar extends Component {
@@ -52,6 +53,10 @@ class Searchbar extends Component {
     );
   }
 }
+
+Searchbar.propTypes = {
+handleSearch: PropTypes.func.isRequired,
+};
 
 export default Searchbar;
 
